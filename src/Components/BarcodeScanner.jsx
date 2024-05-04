@@ -5,7 +5,7 @@ import "react-barcode-scanner/polyfill"
 function Scanner(props) {
 
     const options = {
-        delay: 1000,
+        delay: 100,
         formats: ['qr_code', 'code_128', 'code_39']
     }
 

@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { Button } from '@mui/material'
+import React from 'react';
+import { List, ListItem } from '@mui/material'
 
-const CustomerTotal = (updateValue) => {
-
-    const [total, setTotal] = useState(0);
+const CustomerTotal = (props) => {
 
     return (
-        <Button
+        <List>
+            <ListItem>Last Scanned Item: {props.lastScanned}</ListItem>
+            <ListItem>Total Items: {props.totalCount}</ListItem>
+            <ListItem>Customer Total: ${props.totalValue}</ListItem>
+        </List>
     );
 }
 

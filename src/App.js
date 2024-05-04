@@ -1,56 +1,68 @@
 import './App.css';
 import Scanner from './Components/BarcodeScanner';
 import { useState } from 'react';
-import { Container } from '@mui/material'
 import Button from '@mui/material/Button';
+import CustomerTotal from './Components/CustomerTotal';
+import ScanList from './Components/ScanList';
 
 function App() {
 
-  const [scannedValue, setScannedValue] = useState('Initial Value');
+  const [scannedValue, setScannedValue] = useState('');
   const [totalValue, setTotalValue] = useState(0);
   const [scannedCodes, setScannedCodes] = useState([]);
+  const [isReset, setIsReset] = useState(false)
 
   const handleCapture = (detected) => {
 
-    console.log(scannedCodes.length);
+    const value = detected.rawValue;
 
-    const value = detected.rawValue
-    console.log(value);
-    setScannedValue(value);
+    if (!isReset) {
+      if (value !== scannedValue && (scannedCodes.length === 0 || !scannedCodes.includes(value))) {
+        setScannedValue(value);
+        const numberValue = parseInt(value.split("$")[1]);
+        setTotalValue(totalValue + numberValue);
 
-    if (scannedCodes.length === 0 || !scannedCodes.includes(value)) {
-      console.log("new code!");
-      const numberValue = parseInt(value.split("$")[1]);
-      console.log("Number value", numberValue);
-      setTotalValue(totalValue + numberValue);
-
-      addCode(value);
-    } else {
-      console.log("duplicate code!");
+        addCode(value);
+      } else {
+        console.log("duplicate code!");
+      }
+    } else { //handle resetting scanner
+      setIsReset(false);
     }
   }
 
   const addCode = item => {
+    
     setScannedCodes(currentCodes => [...currentCodes, item]);
-};
+  };
 
   const handleReset = () => {
-    console.log("Scanned codes: ", scannedCodes);
+    setIsReset(true);
+    setTimeout(null, 5000);
+    setScannedCodes([]);
+    setTotalValue(0);
   }
 
   return (
     <div className="App">
       <header className="App-header">
-        {scannedValue}
-        <Scanner
-          onCapture={handleCapture}
+        <CustomerTotal
+          lastScanned={scannedValue}
+          totalCount={scannedCodes.length}
+          totalValue={totalValue}
         />
-      </header>
-      <Container>
-        <Button onClick={handleReset}>
-          ${totalValue}
+        <Button onClick={handleReset} variant='outlined'>
+          {isReset ? "RESETTING" : "RESET"}
         </Button>
-      </Container>
+        <div style={{ "height": "10px" }}></div>
+        <div style={{ "height": "10px" }}></div>
+        <div style={{ "height": "200px" }}>
+          <Scanner
+            onCapture={handleCapture}
+          />
+        </div>
+      </header>
+      <ScanList items={scannedCodes} />
     </div>
   );
 }
