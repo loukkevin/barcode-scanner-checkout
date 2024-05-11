@@ -11,23 +11,29 @@ function App() {
   const [totalValue, setTotalValue] = useState(0);
   const [scannedCodes, setScannedCodes] = useState([]);
   const [isReset, setIsReset] = useState(false)
+  const regex = /\d{1,3}\-\$\d*/gm;
+  const overrideRegex = /9{3}\-\$\d*/gm;
 
   const handleCapture = (detected) => {
 
     const value = detected.rawValue;
 
-    if (!isReset) {
-      if (value !== scannedValue && (scannedCodes.length === 0 || !scannedCodes.includes(value))) {
-        setScannedValue(value);
-        const numberValue = parseInt(value.split("$")[1]);
-        setTotalValue(totalValue + numberValue);
-
-        addCode(value);
-      } else {
-        console.log("duplicate code!");
+    if (regex.test(value)){
+      if (!isReset) {
+        if (value !== scannedValue && (scannedCodes.length === 0 || !scannedCodes.includes(value) || overrideRegex.test(value))) {
+          setScannedValue(value);
+          const numberValue = parseInt(value.split("$")[1]);
+          setTotalValue(totalValue + numberValue);
+  
+          addCode(value);
+        } else {
+          console.log("duplicate code!");
+        }
+      } else { //handle resetting scanner
+        setIsReset(false); 
       }
-    } else { //handle resetting scanner
-      setIsReset(false);
+    } else {
+      console.log("Detected invalid code!", value);
     }
   }
 
